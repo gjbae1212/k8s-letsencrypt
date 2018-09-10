@@ -1,0 +1,13 @@
+{
+  "kind": "Secret",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "${SECRET}",
+    "namespace": "${NAMESPACE}"
+  },
+  "data": {
+    "tls.crt": "${TLS_CRT}",
+    "tls.key": "${TLS_KEY}"
+  },
+  "type": "Opaque"
+}

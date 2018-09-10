@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: ${NAMESPACE}
+  name: letsencypt-ing
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "${STATIC_IP_NAME}"
+spec:
+  tls:
+  - secretName: ${SECERT}
+  rules:
+  - http:
+      paths:
+      - path: /.well-known/*
+        backend:
+          serviceName: letsencrypt-svc
+          servicePort: 80
+      - path: /*
+        backend:
+          serviceName: ${APP_SERVICE}
+          servicePort: 80

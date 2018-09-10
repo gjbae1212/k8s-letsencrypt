@@ -1,0 +1,40 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  namespace: ${NAMESPACE}
+  name: letsencrypt-deploy
+spec:
+  replicas: 1
+  minReadySeconds: 1
+  selector:
+    matchLabels:
+      app: letsencrypt
+  template:
+    metadata:
+      name: letsencrypt
+      labels:
+        app: letsencrypt
+    spec:
+      containers:
+      - name: letsencrypt-container
+        image: ${REPOSITORY}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: EMAIL
+          value: ${EMAIL}
+        - name: DOMAIN
+          value: ${DOMAIN}
+        - name: SECRET
+          value: ${SECRET}
+        volumeMounts:
+        - name: certbot-lib
+          mountPath: /var/lib/letsencrypt
+        - name: certbot-tls
+          mountPath: /etc/letsencrypt
+      volumes:
+      - name : certbot-lib
+        emptyDir: {}
+      - name : certbot-tls
+        emptyDir: {}
