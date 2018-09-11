@@ -17,15 +17,15 @@ CERTPATH=/etc/letsencrypt/live/$(echo $DOMAIN | cut -f1 -d',')
 echo "CERT : ${CERTPATH}"
 
 echo "PUBLIC"
-TLSP_CRT=$(cat ${CERTPATH}/fullchain.pem | base64 | tr -d '\n')
+export TLS_CRT=$(cat ${CERTPATH}/fullchain.pem | base64 | tr -d '\n')
 echo TLS_CRT
 
 echo "PRIVATE"
-TLS_KEY=$(cat ${CERTPATH}/privkey.pem | base64 | tr -d '\n')
+export TLS_KEY=$(cat ${CERTPATH}/privkey.pem | base64 | tr -d '\n')
 echo TLS_KEY
 
 # kubernetes namespace
-NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+export NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
 echo "NAMESPACE : ${NAMESPACE}"
 # update secret
 envsubst < secert-template.json > secret.json

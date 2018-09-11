@@ -1,5 +1,11 @@
 # k8s-letsencrypt
 
+## 설치
+```
+- brew install gettext
+- brew link gettext --force
+```
+
 
 ## certbot 설정
 ```
@@ -7,4 +13,4 @@
 
 ```
 
-## certbot 설정후 APP Update
+## certbot 설정후 App Update
