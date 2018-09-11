@@ -14,3 +14,7 @@
 ```
 
 ## certbot 설정후 App Update
+```
+- bash run.sh update_app [namespace] [ip name] [app service]
+
+```

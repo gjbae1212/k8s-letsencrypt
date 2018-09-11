@@ -12,21 +12,6 @@ function build
    docker push $1
 }
 
-function deploy
-{
-   export NAMESPACE=$1
-   export STATIC_IP_NAME=$2
-   export APP_SERVICE=$3
-
-   if [[ -z $NAMESPACE || -z $STATIC_IP_NAME || -z $APP_SERVICE ]]; then
-	echo "REQUIRE!! NAMESPACE, STATIC_IP_NAME, APP_SERVICE"
-	exit 1
-   fi
-
-   envsubst < $CURRENT/k8s/k8s-complete-ingress.yaml | kubectl apply -f -
-}
-
-
 function certbot
 {
    export REPOSITORY=$1
@@ -53,16 +38,25 @@ function certbot
 
    build $REPOSITORY
 
-   sleep 200 # wait 100 seconds
+   sleep 200 # wait 200 seconds
 
    envsubst < $CURRENT/k8s/k8s-deployment.yaml | kubectl apply -f -
 }
 
 function update_app
 {
-   export NAMESPACE=$1
-   export $STATIC_IP_NAME=$2
-   export APP_SERVICE=$3
+   export DOMAIN=$1
+   export NAMESPACE=$2
+   export SECRET=$3
+   export STATIC_IP_NAME=$4
+   export APP_SERVICE=$5
+
+   if [[ -z $DOMAIN || -z $NAMESPACE || -z $SECRET || -z $STATIC_IP_NAME || -z $APP_SERVICE ]]; then
+	echo "REQUIRE!! DOMAIN, NAMESPACE, SECRET, STATIC_IP_NAME, APP_SERVICE"
+	exit 1
+   fi
+
+   envsubst < $CURRENT/k8s/k8s-complete-ingress.yaml | kubectl apply -f -
 }
 
 
