@@ -4,9 +4,6 @@ metadata:
   namespace: ${NAMESPACE}
   name: letsencypt-ing
   annotations:
-#    kubernetes.io/ingress.class: "nginx"
-#    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    ingress.kubernetes.io/force-ssl-redirect: "true"
     kubernetes.io/ingress.global-static-ip-name: "${STATIC_IP_NAME}"
 spec:
   tls:
