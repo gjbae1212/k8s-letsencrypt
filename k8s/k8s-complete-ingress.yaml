@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   namespace: ${NAMESPACE}
-  name: letsencypt-ing
+  name: ${NAMESPACE}-ing
   annotations:
     kubernetes.io/ingress.global-static-ip-name: "${STATIC_IP_NAME}"
 spec:
