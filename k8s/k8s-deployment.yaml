@@ -33,8 +33,15 @@ spec:
           mountPath: /var/lib/letsencrypt
         - name: certbot-tls
           mountPath: /etc/letsencrypt
+        - name: gcp-secret
+          mountPath: /tmp/gcp
+          readOnly: true
       volumes:
-      - name : certbot-lib
+      - name: certbot-lib
         emptyDir: {}
-      - name : certbot-tls
+      - name: certbot-tls
         emptyDir: {}
+      - name: gcp-secret
+        secret:
+         secretName: gcp-service-account
+         defaultMode: 0600

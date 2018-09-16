@@ -6,11 +6,9 @@ if [[ -z $EMAIL || -z $DOMAIN || -z $SECRET ]]; then
 	exit 1
 fi
 
-# nginx
-cat default.conf | sed "s/\${DOMAIN}/${DOMAIN}/"> /etc/nginx/conf.d/default.conf
-nginx && sleep 5
-
-certbot certonly --webroot -w ${WWW} -n --agree-tos --email ${EMAIL} --no-self-upgrade -d ${DOMAIN} \
+certbot certonly -n --agree-tos --email ${EMAIL} --no-self-upgrade -d "*.${DOMAIN}" -d "${DOMAIN}" \
+--dns-google --dns-google-credentials /tmp/gcp/GCP_JWT  \
+--server https://acme-v02.api.letsencrypt.org/directory \
 --work-dir /var/lib/letsencrypt  --logs-dir /var/log/letsencrypt --config-dir /etc/letsencrypt
 
 CERTPATH=/etc/letsencrypt/live/$(echo $DOMAIN | cut -f1 -d',')
@@ -27,6 +25,7 @@ echo TLS_KEY
 # kubernetes namespace
 export NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
 echo "NAMESPACE : ${NAMESPACE}"
+
 # update secret
 envsubst < secert-template.json > secret.json
 cat secret.json
@@ -40,5 +39,4 @@ curl -v --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
 echo "* 1 * * * /bin/sh /opt/certbot/renew.sh" >> /etc/crontabs/root
 crond -bS -L /var/log/crontab/log
 
-nginx -s stop
-nginx -g 'daemon off;'
+tail -f /var/log/letsencrypt/letsencrypt.log

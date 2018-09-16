@@ -12,10 +12,6 @@ spec:
   - host: ${DOMAIN}
     http:
       paths:
-      - path: /.well-known/*
-        backend:
-          serviceName: letsencrypt-svc
-          servicePort: 80
       - path: /*
         backend:
           serviceName: ${APP_SERVICE}

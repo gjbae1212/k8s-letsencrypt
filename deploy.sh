@@ -14,32 +14,44 @@ function build
 
 function certbot
 {
-   export REPOSITORY=$1
-   export EMAIL=$2
-   export DOMAIN=$3
-   export NAMESPACE=$4
-   export SECRET=$5
-   export STATIC_IP_NAME=$6
+   export GCP_PROJECT=$1 # gcp project id
+   export GCP_JWT_PATH=$2 # gcp jwt path
+   export REPOSITORY=$3 # repository
+   export EMAIL=$4 # email
+   export DOMAIN=$5 # domain
+   export NAMESPACE=$6 # kubernetes namespace
+   export SECRET=$7 # tls secret
+   export BASE64_GCP_PROJECT=`echo $GCP_PROJECT | base64`
+   export BASE64_GCP_JWT=`cat $GCP_JWT_PATH | base64`
 
-   if [[ -z $REPOSITORY || -z $EMAIL || -z $DOMAIN || -z $NAMESPACE || -z $SECRET || -z $STATIC_IP_NAME ]]; then
-	echo "REQUIRE!! REPOSITORY EMAIL, DOMAIN, NAMESPACE, SECRET, STATIC_IP_NAME, APP_SERVICE"
+   if [[ -z $GCP_PROJECT || -z $GCP_JWT_PATH || -z $REPOSITORY || -z $EMAIL || -z $DOMAIN || -z $NAMESPACE || -z $SECRET ]]; then
+	echo "REQUIRE!! GCP_PROJECT, GCP_JWT_PATH, REPOSITORY EMAIL, DOMAINS, NAMESPACE, SECRET"
 	exit 1
    fi
 
+   # [step1] create namespace
+   kubectl create namespace ${NAMESPACE} || true
+
+   # [step2] service account 설정
+   envsubst < $CURRENT/gcp/service-account.yaml | kubectl apply -f -
+
+   # [step3] my account will bind to cluster-admin-role
+   kubectl create clusterrolebinding cluster-admin-binding \
+   --clusterrole cluster-admin --user $(gcloud config get-value account) || true
+
+   # [step4] make secret role
    envsubst < $CURRENT/k8s/k8s-role.yaml | kubectl apply -f -
 
+   # [step5] bind to secret role
    envsubst < $CURRENT/k8s/k8s-rolebinding.yaml | kubectl apply -f -
 
+   # [step6] make empty tls secret
    envsubst < $CURRENT/k8s/k8s-secret.yaml | kubectl apply -f -
 
-   envsubst < $CURRENT/k8s/k8s-service.yaml | kubectl apply -f -
-
-   envsubst < $CURRENT/k8s/k8s-init-ingress.yaml | kubectl apply -f -
-
+   # [step7] build docker image
    build $REPOSITORY
 
-   sleep 200 # wait 200 seconds
-
+   # [step8] deploy
    envsubst < $CURRENT/k8s/k8s-deployment.yaml | kubectl apply -f -
 }
 
