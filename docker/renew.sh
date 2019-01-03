@@ -2,7 +2,10 @@
 
 cd /opt/certbot
 
-certbot renew --quiet --no-self-upgrade >> /var/log/letsencrypt/letsencrypt.log
+certbot certonly -n --agree-tos --email ${EMAIL} --no-self-upgrade -d "*.${DOMAIN}" -d "${DOMAIN}" \
+--dns-google --dns-google-credentials /tmp/gcp/GCP_JWT  \
+--dns-google-propagation-seconds 120 \
+--work-dir /var/lib/letsencrypt  --logs-dir /var/log/letsencrypt --config-dir /etc/letsencrypt
 
 CERTPATH=/etc/letsencrypt/live/$(echo $DOMAIN | cut -f1 -d',')
 echo "CERT : ${CERTPATH}"
