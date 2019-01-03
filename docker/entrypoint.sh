@@ -36,7 +36,7 @@ curl -v --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
 -d @secret.json https://kubernetes.default/api/v1/namespaces/${NAMESPACE}/secrets/${SECRET}
 
 # crontab and renewal
-echo "* 1 * * * /bin/sh /opt/certbot/renew.sh" >> /etc/crontabs/root
+echo "* * * */1 * /bin/sh /opt/certbot/renew.sh" >> /etc/crontabs/root
 crond -bS -L /var/log/crontab/log
 
 tail -f /var/log/letsencrypt/letsencrypt.log
