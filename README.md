@@ -1,6 +1,4 @@
 # k8s-letsencrypt
-==========
-
 add, update wildcard ssl with let's encrypt in gcp
 
 ## 설명
